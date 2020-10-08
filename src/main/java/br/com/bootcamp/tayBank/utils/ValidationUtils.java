@@ -1,7 +1,7 @@
 package br.com.bootcamp.tayBank.utils;
 
+import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.caelum.stella.validation.CPFValidator;
-import org.hibernate.service.spi.ServiceException;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -21,10 +21,8 @@ public class ValidationUtils {
     }
 
     public static void validateCpf(String cpf) throws ServiceException {
-        if(cpf != null && !cpf.isEmpty()) {
-            if(!ValidationUtils.isCpfValid(cpf)) {
-                throw new ServiceException("CPF inválido");
-            }
+        if(!ValidationUtils.isCpfValid(cpf)) {
+            throw new ServiceException("CPF inválido");
         }
     }
 
@@ -50,9 +48,9 @@ public class ValidationUtils {
 
     }
 
-    public static void validateCnh(String cnh) throws ServiceException {
+    public static void validateNumber(String number) throws ServiceException {
         Pattern p = Pattern.compile("[0-9]+");
-        Matcher m = p.matcher(cnh);
+        Matcher m = p.matcher(number);
         boolean matchFound = m.matches();
 
         if(!matchFound) {

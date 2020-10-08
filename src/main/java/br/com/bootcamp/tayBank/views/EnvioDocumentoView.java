@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CadastroClienteView {
+public class EnvioDocumentoView {
     private Long id;
     private String message;
 }

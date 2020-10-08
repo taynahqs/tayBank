@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Getter
@@ -23,6 +24,7 @@ public class CadastroClienteForm {
     private String cnh;
 
     @NotNull(message = "Por favor, informe o cpf")
+    @Size(min = 11, max=11)
     private String cpf;
 
     @NotNull(message = "Por favor, informe a data de nascimento.")
