@@ -1,13 +1,13 @@
 package br.com.bootcamp.tayBank.repositories;
 
-import br.com.bootcamp.tayBank.entities.ClienteEntity;
+import br.com.bootcamp.tayBank.models.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ClienteRepository extends JpaRepository<ClienteEntity, Long> {
+public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
-    ClienteEntity findByCpf(String cpf);
+    List<Cliente> findByCpf(String cpf);
 
-    List<ClienteEntity> findByEmail(String email);
+    List<Cliente> findByEmail(String email);
 }

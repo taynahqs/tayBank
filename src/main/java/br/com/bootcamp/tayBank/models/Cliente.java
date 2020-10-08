@@ -1,4 +1,4 @@
-package br.com.bootcamp.tayBank.entities;
+package br.com.bootcamp.tayBank.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClienteEntity {
+public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,4 +1,4 @@
-package br.com.bootcamp.tayBank.entities;
+package br.com.bootcamp.tayBank.models;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-public class EnderecoEntity {
+public class Endereco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
