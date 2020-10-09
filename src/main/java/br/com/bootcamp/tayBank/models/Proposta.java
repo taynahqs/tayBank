@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,4 +29,8 @@ public class Proposta {
     private Long documentoId;
 
     private StatusPropostaEnum status;
+
+    private LocalDateTime dataCadastro;
+
+    private LocalDateTime dataAtualizacao;
 }

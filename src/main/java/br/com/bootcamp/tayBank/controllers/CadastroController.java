@@ -8,6 +8,7 @@ import br.com.bootcamp.tayBank.services.CadastroService;
 import br.com.bootcamp.tayBank.utils.ValidationUtils;
 import br.com.bootcamp.tayBank.views.CadastroClienteView;
 import br.com.bootcamp.tayBank.views.CadastroEnderecoView;
+import br.com.bootcamp.tayBank.views.DadosPropostaView;
 import br.com.bootcamp.tayBank.views.EnvioDocumentoView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,7 +31,6 @@ public class CadastroController {
         ValidationUtils.validateCpf(cadastroClienteForm.getCpf());
         ValidationUtils.validateEmail(cadastroClienteForm.getEmail());
         ValidationUtils.validateAge(cadastroClienteForm.getDataNascimento());
-        ValidationUtils.validateNumber(cadastroClienteForm.getCnh());
 
         return cadastroService.cadastrarCliente(cadastroClienteForm);
     }
@@ -38,7 +38,6 @@ public class CadastroController {
     @PostMapping("/endereco/{propostaId}")
     @ApiOperation("Cadastro do endereço do cliente.")
     public ResponseEntity<CadastroEnderecoView> cadastrarEndereco(@RequestBody @Valid CadastroEnderecoForm cadastroEnderecoForm, @PathVariable Long propostaId) throws ServiceException {
-        ValidationUtils.validateNumber(cadastroEnderecoForm.getCep());
         return cadastroService.cadastrarEndereco(cadastroEnderecoForm, propostaId);
     }
 
@@ -46,5 +45,11 @@ public class CadastroController {
     @ApiOperation("Envio de foto do documento")
     public ResponseEntity<EnvioDocumentoView> envioDocumento(@RequestBody @Valid EnvioDocumentoForm envioDocumentoForm, @PathVariable Long propostaId) throws ServiceException {
         return cadastroService.envioDocumento(envioDocumentoForm, propostaId);
+    }
+
+    @GetMapping("/dadosProposta/{propostaId}")
+    @ApiOperation("Confirmação dos dados da proposta")
+    public ResponseEntity<DadosPropostaView> dadosProposta(@PathVariable Long propostaId) throws ServiceException {
+        return cadastroService.dadosProposta(propostaId);
     }
 }

@@ -5,10 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,7 +20,10 @@ public class Documento {
 
     private Long clienteId;
 
-    private String documentoFrente;
+    @Column(columnDefinition="CLOB")
+    private String documento;
 
-    private String documentoVerso;
+    private LocalDateTime dataCadastro;
+
+    private LocalDateTime dataAtualizacao;
 }

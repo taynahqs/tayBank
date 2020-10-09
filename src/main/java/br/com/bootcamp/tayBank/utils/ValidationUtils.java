@@ -47,16 +47,4 @@ public class ValidationUtils {
         }
 
     }
-
-    public static void validateNumber(String number) throws ServiceException {
-        Pattern p = Pattern.compile("[0-9]+");
-        Matcher m = p.matcher(number);
-        boolean matchFound = m.matches();
-
-        if(!matchFound) {
-            throw new ServiceException("Formato da CNH inválido");
-        }
-    }
-
-
 }

@@ -1,5 +1,6 @@
 package br.com.bootcamp.tayBank.services.impl;
 
+import br.com.bootcamp.tayBank.enums.StatusPropostaEnum;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
@@ -13,15 +14,15 @@ import br.com.bootcamp.tayBank.repositories.DocumentoRepository;
 import br.com.bootcamp.tayBank.repositories.EnderecoRepository;
 import br.com.bootcamp.tayBank.repositories.PropostaRepository;
 import br.com.bootcamp.tayBank.services.CadastroService;
-import br.com.bootcamp.tayBank.views.CadastroClienteView;
-import br.com.bootcamp.tayBank.views.CadastroEnderecoView;
-import br.com.bootcamp.tayBank.views.EnvioDocumentoView;
+import br.com.bootcamp.tayBank.utils.ModelMapperUtils;
+import br.com.bootcamp.tayBank.views.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,13 +57,16 @@ public class CadastroServiceImpl implements CadastroService {
         cliente.setNome(form.getNome());
         cliente.setSobrenome(form.getSobrenome());
         cliente.setEmail(form.getEmail());
-        cliente.setCnh(form.getCnh());
         cliente.setCpf(form.getCpf());
         cliente.setDataNascimento(form.getDataNascimento());
+        cliente.setDataCadastro(LocalDateTime.now());
+        cliente.setDataAtualizacao(LocalDateTime.now());
         clienteRepository.save(cliente);
 
         Proposta proposta = new Proposta();
         proposta.setClienteId(cliente.getId());
+        proposta.setDataCadastro(LocalDateTime.now());
+        proposta.setDataAtualizacao(LocalDateTime.now());
         propostaRepository.save(proposta);
 
         CadastroClienteView view = new CadastroClienteView(cliente.getId(), "Cliente cadastrado com sucesso!");
@@ -85,22 +89,21 @@ public class CadastroServiceImpl implements CadastroService {
         if(cliente.isEmpty()) {
             throw new ServiceException("Cliente não cadastrado");
         }
-        //formatando o CEP
-        String cep1Parte = form.getCep().substring(0,5);
-        String cep2Parte = form.getCep().substring(5);
-        String cep = cep1Parte.concat("-").concat(cep2Parte);
 
         Endereco endereco = new Endereco();
         endereco.setClienteId(clienteId);
-        endereco.setCep(cep);
+        endereco.setCep(form.getCep());
         endereco.setRua(form.getRua());
         endereco.setBairro(form.getBairro());
         endereco.setComplemento(form.getComplemento());
         endereco.setCidade(form.getCidade());
         endereco.setEstado(form.getEstado());
+        endereco.setDataCadastro(LocalDateTime.now());
+        endereco.setDataAtualizacao(LocalDateTime.now());
         enderecoRepository.save(endereco);
 
         proposta.get().setEnderecoId(endereco.getId());
+        proposta.get().setDataAtualizacao(LocalDateTime.now());
         propostaRepository.save(proposta.get());
 
         HttpHeaders headers = new HttpHeaders();
@@ -129,17 +132,20 @@ public class CadastroServiceImpl implements CadastroService {
             throw new ServiceException("Endereço do cliente não encontrado");
         }
 
-        if(!form.getCnhFrente().startsWith("data:image") || !form.getCnhVerso().startsWith("data:image")) {
+        if(!form.getCpf().startsWith("data:image")) {
             throw new ServiceException("Imagens corrompidas, por favor, envie novamente");
         }
 
         Documento documento = new Documento();
         documento.setClienteId(clienteId);
-        documento.setDocumentoFrente(form.getCnhFrente());
-        documento.setDocumentoVerso(form.getCnhVerso());
+        documento.setDocumento(form.getCpf());
+        documento.setDataCadastro(LocalDateTime.now());
+        documento.setDataAtualizacao(LocalDateTime.now());
         documentoRepository.save(documento);
 
         proposta.get().setDocumentoId(documento.getId());
+        proposta.get().setDataAtualizacao(LocalDateTime.now());
+        proposta.get().setStatus(StatusPropostaEnum.AGUARDANDO_APROVACAO);
         propostaRepository.save(proposta.get());
 
         HttpHeaders headers = new HttpHeaders();
@@ -148,5 +154,45 @@ public class CadastroServiceImpl implements CadastroService {
         EnvioDocumentoView view = new EnvioDocumentoView(documento.getId(), "Documento enviado com sucesso!");
 
         return new ResponseEntity<>(view, headers, HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<DadosPropostaView> dadosProposta(Long propostaId) throws ServiceException {
+        Optional<Proposta> proposta = propostaRepository.findById(propostaId);
+        if(proposta.isEmpty()){
+            throw new ServiceException("Proposta não encontrada");
+        }
+
+        Long clienteId = proposta.get().getClienteId();
+
+        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
+        if(cliente.isEmpty()) {
+            throw new ServiceException("Cliente não cadastrado");
+        }
+
+        List<Endereco> endereco = enderecoRepository.findByClienteId(clienteId);
+        if(endereco == null || endereco.isEmpty()) {
+            throw new ServiceException("Endereço do cliente não encontrado");
+        }
+
+        List<Documento> documento = documentoRepository.findByClienteId(clienteId);
+        if(documento == null || documento.isEmpty()) {
+            throw new ServiceException("Documento do cliente não enviado");
+        }
+
+        ClienteView clienteView = (ClienteView) ModelMapperUtils.convert(cliente.get(), ClienteView.class);
+        EnderecoView enderecoView = (EnderecoView) ModelMapperUtils.convert(endereco, EnderecoView.class);
+        DocumentoView documentoView = (DocumentoView) ModelMapperUtils.convert(documento, DocumentoView.class);
+
+        DadosPropostaView view = new DadosPropostaView(
+                proposta.get().getId(),
+                clienteView,
+                enderecoView,
+                documentoView);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.LOCATION, "/dadosProposta/" + proposta.get().getId());
+
+
+        return new ResponseEntity<>(view, headers, HttpStatus.OK);
     }
 }

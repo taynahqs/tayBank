@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EnvioDocumentoForm {
-    private String cnhFrente;
-    private String cnhVerso;
+    private String cpf;
 }

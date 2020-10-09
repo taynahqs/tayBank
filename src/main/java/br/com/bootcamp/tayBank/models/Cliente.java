@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -25,10 +26,13 @@ public class Cliente {
 
     private String email;
 
-    private String cnh;
-
     private LocalDate dataNascimento;
 
     private String cpf;
+
+    private LocalDateTime dataCadastro;
+
+    private LocalDateTime dataAtualizacao;
+
 
 }
