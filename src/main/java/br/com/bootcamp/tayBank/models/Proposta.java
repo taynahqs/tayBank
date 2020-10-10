@@ -1,15 +1,13 @@
 package br.com.bootcamp.tayBank.models;
 
+import br.com.bootcamp.tayBank.converters.StatusPropostaConverter;
 import br.com.bootcamp.tayBank.enums.StatusPropostaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,12 +20,15 @@ public class Proposta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String cpfCliente;
+
     private Long clienteId;
 
     private Long enderecoId;
 
     private Long documentoId;
 
+    @Convert(converter = StatusPropostaConverter.class)
     private StatusPropostaEnum status;
 
     private LocalDateTime dataCadastro;

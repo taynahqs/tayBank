@@ -1,6 +1,8 @@
 package br.com.bootcamp.tayBank.services.impl;
 
 import br.com.bootcamp.tayBank.enums.StatusPropostaEnum;
+import br.com.bootcamp.tayBank.exceptions.MissedStepException;
+import br.com.bootcamp.tayBank.exceptions.ProposalNotFoundException;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
@@ -15,6 +17,7 @@ import br.com.bootcamp.tayBank.repositories.EnderecoRepository;
 import br.com.bootcamp.tayBank.repositories.PropostaRepository;
 import br.com.bootcamp.tayBank.services.CadastroService;
 import br.com.bootcamp.tayBank.utils.ModelMapperUtils;
+import br.com.bootcamp.tayBank.utils.SendEmailUtils;
 import br.com.bootcamp.tayBank.views.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -65,6 +68,7 @@ public class CadastroServiceImpl implements CadastroService {
 
         Proposta proposta = new Proposta();
         proposta.setClienteId(cliente.getId());
+        proposta.setCpfCliente(form.getCpf());
         proposta.setDataCadastro(LocalDateTime.now());
         proposta.setDataAtualizacao(LocalDateTime.now());
         propostaRepository.save(proposta);
@@ -88,6 +92,10 @@ public class CadastroServiceImpl implements CadastroService {
         Optional<Cliente> cliente = clienteRepository.findById(clienteId);
         if(cliente.isEmpty()) {
             throw new ServiceException("Cliente não cadastrado");
+        }
+
+        if(proposta.get().getDocumentoId() != null) {
+            throw new ServiceException("Documento já foi enviado!");
         }
 
         Endereco endereco = new Endereco();
@@ -114,26 +122,26 @@ public class CadastroServiceImpl implements CadastroService {
         return new ResponseEntity<>(view, headers, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<EnvioDocumentoView> envioDocumento(EnvioDocumentoForm form, Long propostaId) throws ServiceException {
+    public ResponseEntity<EnvioDocumentoView> envioDocumento(EnvioDocumentoForm form, Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
         Optional<Proposta> proposta = propostaRepository.findById(propostaId);
         if(proposta.isEmpty()){
-            throw new ServiceException("Proposta não encontrada");
+            throw new ProposalNotFoundException("Proposta não encontrada");
         }
 
         Long clienteId = proposta.get().getClienteId();
 
         Optional<Cliente> cliente = clienteRepository.findById(clienteId);
         if(cliente.isEmpty()) {
-            throw new ServiceException("Cliente não cadastrado");
+            throw new MissedStepException("Por favor, volte na etapa de cadastro do cliente");
         }
 
         List<Endereco> endereco = enderecoRepository.findByClienteId(clienteId);
         if(endereco == null || endereco.isEmpty()) {
-            throw new ServiceException("Endereço do cliente não encontrado");
+            throw new MissedStepException("Por favor, volte na etapa de cadastro do endereço");
         }
 
         if(!form.getCpf().startsWith("data:image")) {
-            throw new ServiceException("Imagens corrompidas, por favor, envie novamente");
+            throw new ServiceException("Imagem corrompida, por favor, envie novamente");
         }
 
         Documento documento = new Documento();
@@ -156,32 +164,32 @@ public class CadastroServiceImpl implements CadastroService {
         return new ResponseEntity<>(view, headers, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<DadosPropostaView> dadosProposta(Long propostaId) throws ServiceException {
+    public ResponseEntity<DadosPropostaView> dadosProposta(Long propostaId) throws ProposalNotFoundException, MissedStepException {
         Optional<Proposta> proposta = propostaRepository.findById(propostaId);
         if(proposta.isEmpty()){
-            throw new ServiceException("Proposta não encontrada");
+            throw new ProposalNotFoundException("Proposta não encontrada");
         }
 
         Long clienteId = proposta.get().getClienteId();
 
         Optional<Cliente> cliente = clienteRepository.findById(clienteId);
         if(cliente.isEmpty()) {
-            throw new ServiceException("Cliente não cadastrado");
+            throw new MissedStepException("Cliente não cadastrado");
         }
 
         List<Endereco> endereco = enderecoRepository.findByClienteId(clienteId);
         if(endereco == null || endereco.isEmpty()) {
-            throw new ServiceException("Endereço do cliente não encontrado");
+            throw new MissedStepException("Endereço do cliente não encontrado");
         }
 
         List<Documento> documento = documentoRepository.findByClienteId(clienteId);
         if(documento == null || documento.isEmpty()) {
-            throw new ServiceException("Documento do cliente não enviado");
+            throw new MissedStepException("Documento do cliente não enviado");
         }
 
         ClienteView clienteView = (ClienteView) ModelMapperUtils.convert(cliente.get(), ClienteView.class);
-        EnderecoView enderecoView = (EnderecoView) ModelMapperUtils.convert(endereco, EnderecoView.class);
-        DocumentoView documentoView = (DocumentoView) ModelMapperUtils.convert(documento, DocumentoView.class);
+        EnderecoView enderecoView = (EnderecoView) ModelMapperUtils.convert(endereco.get(0), EnderecoView.class);
+        DocumentoView documentoView = (DocumentoView) ModelMapperUtils.convert(documento.get(0), DocumentoView.class);
 
         DadosPropostaView view = new DadosPropostaView(
                 proposta.get().getId(),
@@ -190,9 +198,65 @@ public class CadastroServiceImpl implements CadastroService {
                 documentoView);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, "/dadosProposta/" + proposta.get().getId());
+        headers.add(HttpHeaders.LOCATION, "/aceite" + proposta.get().getId());
 
 
         return new ResponseEntity<>(view, headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<AceiteView> aceite(Boolean aceite, Long propostaId) throws ProposalNotFoundException, MissedStepException {
+        Optional<Proposta> proposta = propostaRepository.findById(propostaId);
+        if(proposta.isEmpty()){
+            throw new ProposalNotFoundException("Proposta não encontrada");
+        }
+
+        Long clienteId = proposta.get().getClienteId();
+
+        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
+        if(cliente.isEmpty()) {
+            throw new MissedStepException("Cliente não cadastrado");
+        }
+
+        List<Endereco> endereco = enderecoRepository.findByClienteId(clienteId);
+        if(endereco == null || endereco.isEmpty()) {
+            throw new MissedStepException("Endereço do cliente não encontrado");
+        }
+
+        List<Documento> documento = documentoRepository.findByClienteId(clienteId);
+        if(documento == null || documento.isEmpty()) {
+            throw new MissedStepException("Documento do cliente não enviado");
+        }
+
+        if(aceite) {
+            String para = cliente.get().getEmail();
+            String assunto = "Criação de conta - Banco Digital TayBank";
+            String mensagem = "Olá, tudo bem?\n\n" +
+                    "Agradecemos o aceite da proposta, em breve você receberá os dados de sua conta.\n\n" +
+                    "Cordialmente,\n" +
+                    "Equipe TayBank";
+
+            SendEmailUtils.SendEmail(para, assunto, mensagem);
+
+            proposta.get().setStatus(StatusPropostaEnum.CRIACAO_CONTA);
+            propostaRepository.save(proposta.get());
+        } else {
+            String para = cliente.get().getEmail();
+            String assunto = "Podemos conversar? - Banco Digital TayBank";
+            String mensagem = "Olá, tudo bem?\n\n" +
+                    "Percebemos que você não aceitou nossa proposta de criação de conta, podemos conversar e entender o motivo," +
+                    "tudo no nosso banco é combinável :D.\n" +
+                    "Por favor, entre em contato conosco através do 0800 000 0000.\n\n" +
+                    "Cordialmente,\n" +
+                    "Equipe TayBank";
+            SendEmailUtils.SendEmail(para, assunto, mensagem);
+
+            proposta.get().setStatus(StatusPropostaEnum.RECUSADO);
+            propostaRepository.save(proposta.get());
+        }
+
+        AceiteView view = new AceiteView(propostaId, "Email enviado.");
+
+        return new ResponseEntity<>(view, HttpStatus.OK);
     }
 }

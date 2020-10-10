@@ -1,17 +1,17 @@
 package br.com.bootcamp.tayBank.controllers;
 
+import br.com.bootcamp.tayBank.exceptions.MissedStepException;
+import br.com.bootcamp.tayBank.exceptions.ProposalNotFoundException;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.bootcamp.tayBank.forms.CadastroClienteForm;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
 import br.com.bootcamp.tayBank.services.CadastroService;
 import br.com.bootcamp.tayBank.utils.ValidationUtils;
-import br.com.bootcamp.tayBank.views.CadastroClienteView;
-import br.com.bootcamp.tayBank.views.CadastroEnderecoView;
-import br.com.bootcamp.tayBank.views.DadosPropostaView;
-import br.com.bootcamp.tayBank.views.EnvioDocumentoView;
+import br.com.bootcamp.tayBank.views.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ResponseHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,13 +43,19 @@ public class CadastroController {
 
     @PostMapping("/documento/{propostaId}")
     @ApiOperation("Envio de foto do documento")
-    public ResponseEntity<EnvioDocumentoView> envioDocumento(@RequestBody @Valid EnvioDocumentoForm envioDocumentoForm, @PathVariable Long propostaId) throws ServiceException {
+    public ResponseEntity<EnvioDocumentoView> envioDocumento(@RequestBody @Valid EnvioDocumentoForm envioDocumentoForm, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
         return cadastroService.envioDocumento(envioDocumentoForm, propostaId);
     }
 
     @GetMapping("/dadosProposta/{propostaId}")
     @ApiOperation("Confirmação dos dados da proposta")
-    public ResponseEntity<DadosPropostaView> dadosProposta(@PathVariable Long propostaId) throws ServiceException {
+    public ResponseEntity<DadosPropostaView> dadosProposta(@PathVariable Long propostaId) throws MissedStepException, ProposalNotFoundException {
         return cadastroService.dadosProposta(propostaId);
+    }
+
+    @PutMapping("/aceite/{propostaId}")
+    @ApiOperation("Confirmação e aceite da proposta")
+    public ResponseEntity<AceiteView> aceite(@RequestHeader Boolean aceite, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
+        return cadastroService.aceite(aceite, propostaId);
     }
 }

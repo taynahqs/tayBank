@@ -43,6 +43,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return errors;
     }
 
+    @ExceptionHandler({ProposalNotFoundException.class})
+    private ResponseEntity<Object> proposalNotFoundException(ProposalNotFoundException ex) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        List<String> message = new ArrayList<>();
+        message.add(ex.getMessage());
+        ApiError apiError = new ApiError(status, message);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
+    @ExceptionHandler({MissedStepException.class})
+    private ResponseEntity<Object> missedStepException(MissedStepException ex) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+        List<String> message = new ArrayList<>();
+        message.add(ex.getMessage());
+        ApiError apiError = new ApiError(status, message);
+        return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getStatus());
+    }
+
     @Getter
     public static class Error {
         private String message;
