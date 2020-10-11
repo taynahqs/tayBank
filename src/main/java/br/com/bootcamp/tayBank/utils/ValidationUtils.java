@@ -45,6 +45,15 @@ public class ValidationUtils {
         if (age < 18)  {
             throw new ServiceException("O cliente deve ter mais de 18 anos");
         }
+    }
 
+    public static void validatePassword(String senha) throws ServiceException {
+        Pattern p = Pattern.compile("(?=.*[}{,.^?~=+\\-_\\/*\\-+.\\|])(?=.*[a-zA-Z])(?=.*[0-9]).{8,}");
+        Matcher m = p.matcher(senha);
+        boolean matchFound = m.matches();
+
+        if(!matchFound) {
+            throw new ServiceException("Senha deve conter 8 caracteres, incluindo no mínimo 1 letra, 1 número e 1 caractere especial");
+        }
     }
 }

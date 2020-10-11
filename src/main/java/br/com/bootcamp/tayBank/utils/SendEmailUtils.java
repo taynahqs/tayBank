@@ -2,9 +2,10 @@ package br.com.bootcamp.tayBank.utils;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.*;
 import javax.mail.*;
-import javax.mail.internet.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
 public class SendEmailUtils {
 

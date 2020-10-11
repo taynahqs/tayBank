@@ -4,11 +4,11 @@ import br.com.bootcamp.tayBank.enums.StatusPropostaEnum;
 import br.com.bootcamp.tayBank.exceptions.MissedStepException;
 import br.com.bootcamp.tayBank.exceptions.ProposalNotFoundException;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
+import br.com.bootcamp.tayBank.forms.CadastroClienteForm;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
 import br.com.bootcamp.tayBank.forms.DadosPropostaForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
 import br.com.bootcamp.tayBank.models.Cliente;
-import br.com.bootcamp.tayBank.forms.CadastroClienteForm;
 import br.com.bootcamp.tayBank.models.Documento;
 import br.com.bootcamp.tayBank.models.Endereco;
 import br.com.bootcamp.tayBank.models.Proposta;
@@ -47,13 +47,13 @@ public class CadastroServiceImpl implements CadastroService {
 
     @Override
     public ResponseEntity<CadastroClienteView> cadastrarCliente(CadastroClienteForm form) throws ServiceException {
-        List<Cliente> clienteEmail = clienteRepository.findByEmail(form.getEmail());
-        if(clienteEmail != null && !clienteEmail.isEmpty()) {
+        Cliente clienteEmail = clienteRepository.findByEmail(form.getEmail());
+        if(clienteEmail != null) {
             throw new ServiceException("Email já utilizado.");
         }
 
-        List<Cliente> clienteCpf = clienteRepository.findByCpf(form.getCpf());
-        if(clienteCpf != null && !clienteCpf.isEmpty()) {
+        Cliente clienteCpf = clienteRepository.findByCpf(form.getCpf());
+        if(clienteCpf != null) {
             throw new ServiceException("CPF já utilizado.");
         }
 

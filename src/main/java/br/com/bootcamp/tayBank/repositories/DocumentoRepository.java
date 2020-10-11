@@ -1,6 +1,5 @@
 package br.com.bootcamp.tayBank.repositories;
 
-import br.com.bootcamp.tayBank.models.Cliente;
 import br.com.bootcamp.tayBank.models.Documento;
 import org.springframework.data.jpa.repository.JpaRepository;
 

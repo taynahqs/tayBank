@@ -1,5 +1,6 @@
 package br.com.bootcamp.tayBank.models;
 
+import br.com.bootcamp.tayBank.enums.StatusAcessoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,27 +17,21 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Cliente {
+public class Acesso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nome;
+    private Long clienteId;
 
-    private String sobrenome;
+    private String tokenValidacao;
 
-    private String email;
+    private LocalDateTime validadeTokenValidacao;
 
-    private LocalDate dataNascimento;
+    private String senha;
 
-    private String cpf;
-
-    private Long acessoId;
-
-    private LocalDateTime dataCadastro;
-
-    private LocalDateTime dataAtualizacao;
+    private StatusAcessoEnum status;
 
 
 }
