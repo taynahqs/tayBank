@@ -5,6 +5,7 @@ import br.com.bootcamp.tayBank.exceptions.ProposalNotFoundException;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.bootcamp.tayBank.forms.CadastroClienteForm;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
+import br.com.bootcamp.tayBank.forms.DadosPropostaForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
 import br.com.bootcamp.tayBank.services.CadastroService;
 import br.com.bootcamp.tayBank.utils.ValidationUtils;
@@ -57,5 +58,11 @@ public class CadastroController {
     @ApiOperation("Confirmação e aceite da proposta")
     public ResponseEntity<AceiteView> aceite(@RequestHeader Boolean aceite, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
         return cadastroService.aceite(aceite, propostaId);
+    }
+
+    @PutMapping("/dadosProposta/{propostaId}")
+    @ApiOperation("Editar algum dado da proposta")
+    public ResponseEntity<DadosPropostaView> dadosProposta(@RequestBody DadosPropostaForm dadosPropostaForm, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
+        return cadastroService.editaDadosProposta(dadosPropostaForm, propostaId);
     }
 }

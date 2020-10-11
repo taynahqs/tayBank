@@ -5,6 +5,7 @@ import br.com.bootcamp.tayBank.exceptions.ProposalNotFoundException;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.bootcamp.tayBank.forms.CadastroClienteForm;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
+import br.com.bootcamp.tayBank.forms.DadosPropostaForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
 import br.com.bootcamp.tayBank.views.*;
 import org.springframework.http.ResponseEntity;
@@ -20,4 +21,6 @@ public interface CadastroService {
     ResponseEntity<DadosPropostaView> dadosProposta(Long propostaId) throws ProposalNotFoundException, MissedStepException;
 
     ResponseEntity<AceiteView> aceite(Boolean aceite, Long propostaId) throws ProposalNotFoundException, MissedStepException;
+
+    ResponseEntity<DadosPropostaView> editaDadosProposta(DadosPropostaForm dadosPropostaForm, Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException;
 }

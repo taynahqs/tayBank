@@ -5,6 +5,7 @@ import br.com.bootcamp.tayBank.exceptions.MissedStepException;
 import br.com.bootcamp.tayBank.exceptions.ProposalNotFoundException;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
+import br.com.bootcamp.tayBank.forms.DadosPropostaForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
 import br.com.bootcamp.tayBank.models.Cliente;
 import br.com.bootcamp.tayBank.forms.CadastroClienteForm;
@@ -94,8 +95,9 @@ public class CadastroServiceImpl implements CadastroService {
             throw new ServiceException("Cliente não cadastrado");
         }
 
-        if(proposta.get().getDocumentoId() != null) {
-            throw new ServiceException("Documento já foi enviado!");
+        List<Endereco> enderecoList = enderecoRepository.findByClienteId(clienteId);
+        if(enderecoList != null && !enderecoList.isEmpty()){
+            throw new ServiceException("Endereço já cadastrado");
         }
 
         Endereco endereco = new Endereco();
@@ -206,28 +208,13 @@ public class CadastroServiceImpl implements CadastroService {
 
     @Override
     public ResponseEntity<AceiteView> aceite(Boolean aceite, Long propostaId) throws ProposalNotFoundException, MissedStepException {
+        //validacao se todos os passos foram preenchidos
+        validaPassos(propostaId);
+
         Optional<Proposta> proposta = propostaRepository.findById(propostaId);
-        if(proposta.isEmpty()){
-            throw new ProposalNotFoundException("Proposta não encontrada");
-        }
+        Optional<Cliente> cliente = clienteRepository.findById(proposta.get().getClienteId());
 
-        Long clienteId = proposta.get().getClienteId();
-
-        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
-        if(cliente.isEmpty()) {
-            throw new MissedStepException("Cliente não cadastrado");
-        }
-
-        List<Endereco> endereco = enderecoRepository.findByClienteId(clienteId);
-        if(endereco == null || endereco.isEmpty()) {
-            throw new MissedStepException("Endereço do cliente não encontrado");
-        }
-
-        List<Documento> documento = documentoRepository.findByClienteId(clienteId);
-        if(documento == null || documento.isEmpty()) {
-            throw new MissedStepException("Documento do cliente não enviado");
-        }
-
+        //envio de email de acordo com a resposta da proposta
         if(aceite) {
             String para = cliente.get().getEmail();
             String assunto = "Criação de conta - Banco Digital TayBank";
@@ -258,5 +245,84 @@ public class CadastroServiceImpl implements CadastroService {
         AceiteView view = new AceiteView(propostaId, "Email enviado.");
 
         return new ResponseEntity<>(view, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<DadosPropostaView> editaDadosProposta(DadosPropostaForm form, Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
+        //validacao se todos os passos foram preenchidos
+        validaPassos(propostaId);
+
+        Optional<Proposta> proposta = propostaRepository.findById(propostaId);
+        Long clienteId = proposta.get().getClienteId();
+
+        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
+        if(form.getCliente() != null) {
+            ClienteView clienteForm = form.getCliente();
+            cliente.get().setNome(clienteForm.getNome() == null ? cliente.get().getNome() : clienteForm.getNome());
+            cliente.get().setSobrenome(clienteForm.getSobrenome() == null ? cliente.get().getSobrenome() : clienteForm.getSobrenome());
+            cliente.get().setCpf(clienteForm.getCpf() == null ? cliente.get().getCpf() : clienteForm.getCpf());
+            cliente.get().setDataNascimento(clienteForm.getDataNascimento() == null ? cliente.get().getDataNascimento() : clienteForm.getDataNascimento());
+            cliente.get().setEmail(clienteForm.getEmail() == null ? cliente.get().getEmail() : clienteForm.getEmail());
+            cliente.get().setDataAtualizacao(LocalDateTime.now());
+            clienteRepository.save(cliente.get());
+        }
+        List<Endereco> endereco = enderecoRepository.findByClienteId(clienteId);
+        if(form.getEndereco() != null) {
+            EnderecoView enderecoForm = form.getEndereco();
+            endereco.get(0).setRua(enderecoForm.getRua() == null ? endereco.get(0).getRua() : enderecoForm.getRua());
+            endereco.get(0).setCep(enderecoForm.getCep() == null ? endereco.get(0).getCep() : enderecoForm.getCep());
+            endereco.get(0).setBairro(enderecoForm.getBairro() == null ? endereco.get(0).getBairro() : enderecoForm.getBairro());
+            endereco.get(0).setComplemento(enderecoForm.getComplemento() == null ? endereco.get(0).getComplemento() : enderecoForm.getComplemento());
+            endereco.get(0).setCidade(enderecoForm.getCidade() == null ? endereco.get(0).getCidade() : enderecoForm.getCidade());
+            endereco.get(0).setEstado(enderecoForm.getEstado() == null ? endereco.get(0).getEstado() : enderecoForm.getEstado());
+            endereco.get(0).setDataAtualizacao(LocalDateTime.now());
+            enderecoRepository.save(endereco.get(0));
+        }
+        List<Documento> documento = documentoRepository.findByClienteId(clienteId);
+        if(form.getDocumento() != null) {
+            DocumentoView documentoView = form.getDocumento();
+            documento.get(0).setDocumento(documentoView.getDocumento() == null ? documento.get(0).getDocumento() : documentoView.getDocumento());
+            documento.get(0).setDataAtualizacao(LocalDateTime.now());
+            documentoRepository.save(documento.get(0));
+        }
+
+        ClienteView clienteView = (ClienteView) ModelMapperUtils.convert(cliente.get(), ClienteView.class);
+        EnderecoView enderecoView = (EnderecoView) ModelMapperUtils.convert(endereco.get(0), EnderecoView.class);
+        DocumentoView documentoView = (DocumentoView) ModelMapperUtils.convert(documento.get(0), DocumentoView.class);
+
+        DadosPropostaView view = new DadosPropostaView(
+                proposta.get().getId(),
+                clienteView,
+                enderecoView,
+                documentoView);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.LOCATION, "/aceite" + proposta.get().getId());
+
+        return new ResponseEntity<>(view, headers, HttpStatus.OK);
+    }
+
+    private void validaPassos(Long propostaId) throws ProposalNotFoundException, MissedStepException {
+        Optional<Proposta> proposta = propostaRepository.findById(propostaId);
+        if(proposta.isEmpty()){
+            throw new ProposalNotFoundException("Proposta não encontrada");
+        }
+
+        Long clienteId = proposta.get().getClienteId();
+
+        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
+        if(cliente.isEmpty()) {
+            throw new MissedStepException("Cliente não cadastrado");
+        }
+
+        List<Endereco> endereco = enderecoRepository.findByClienteId(clienteId);
+        if(endereco == null || endereco.isEmpty()) {
+            throw new MissedStepException("Endereço do cliente não encontrado");
+        }
+
+        List<Documento> documento = documentoRepository.findByClienteId(clienteId);
+        if(documento == null || documento.isEmpty()) {
+            throw new MissedStepException("Documento do cliente não enviado");
+        }
     }
 }

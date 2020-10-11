@@ -7,7 +7,8 @@ public enum StatusPropostaEnum {
     AGUARDANDO_APROVACAO("AGUARDANDO_APROVACAO"),
     APROVADO("APROVADO"),
     RECUSADO("RECUSADO"),
-    CRIACAO_CONTA("CRIACAO_CONTA");
+    CRIACAO_CONTA("CRIACAO_CONTA"),
+    CONTA_CRIADA("CONTA_CRIADA");
 
     private final String value;
 
