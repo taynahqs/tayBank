@@ -4,7 +4,7 @@ Este projeto é sobre um banco digital no qual o cliente pode solicitar uma prop
 
 ## Começando
 
-No projeto é utiliazdo o banco em memória H2, portanto, cada vez que o sistema é startado o banco de dados é resetado. Por isso é necessário seguir uma ordem para chamada dos serviços:
+No projeto é utilizado o banco em memória H2, portanto, cada vez que o sistema é startado o banco de dados é resetado. Por isso é necessário seguir uma ordem para chamada dos serviços:
 
 ```
 //CADASTRO E ACEITE DA PROPOSTA
