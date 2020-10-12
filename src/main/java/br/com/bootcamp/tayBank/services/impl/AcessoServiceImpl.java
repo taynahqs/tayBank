@@ -4,21 +4,19 @@ import br.com.bootcamp.tayBank.enums.StatusAcessoEnum;
 import br.com.bootcamp.tayBank.exceptions.ServiceException;
 import br.com.bootcamp.tayBank.forms.AtivaUsuarioForm;
 import br.com.bootcamp.tayBank.forms.CriaTokenForm;
-import br.com.bootcamp.tayBank.models.Acesso;
-import br.com.bootcamp.tayBank.models.Cliente;
+import br.com.bootcamp.tayBank.model.Acesso;
+import br.com.bootcamp.tayBank.model.Cliente;
 import br.com.bootcamp.tayBank.repositories.AcessoRepository;
 import br.com.bootcamp.tayBank.repositories.ClienteRepository;
 import br.com.bootcamp.tayBank.services.AcessoService;
 import br.com.bootcamp.tayBank.utils.SendEmailUtils;
 import br.com.bootcamp.tayBank.views.TokenView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.sql.rowset.serial.SerialException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
@@ -41,7 +39,7 @@ public class AcessoServiceImpl implements AcessoService {
 
         String token = String.format("%05d", new Random().nextInt(100000));
 
-        Optional<Acesso> acesso1 = acessoRepository.findById(cliente.getAcessoId());
+        Optional<Acesso> acesso1 = acessoRepository.findById(cliente.getId());
 
         if(acesso1.isEmpty()) {
             Acesso acesso = new Acesso();

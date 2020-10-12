@@ -1,6 +1,6 @@
 package br.com.bootcamp.tayBank.repositories;
 
-import br.com.bootcamp.tayBank.models.Endereco;
+import br.com.bootcamp.tayBank.model.Endereco;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

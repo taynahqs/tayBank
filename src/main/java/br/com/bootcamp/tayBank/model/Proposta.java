@@ -1,5 +1,7 @@
-package br.com.bootcamp.tayBank.models;
+package br.com.bootcamp.tayBank.model;
 
+import br.com.bootcamp.tayBank.converters.StatusPropostaConverter;
+import br.com.bootcamp.tayBank.enums.StatusPropostaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,15 +15,21 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Documento {
+public class Proposta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String cpfCliente;
+
     private Long clienteId;
 
-    @Column(columnDefinition="CLOB")
-    private String documento;
+    private Long enderecoId;
+
+    private Long documentoId;
+
+    @Convert(converter = StatusPropostaConverter.class)
+    private StatusPropostaEnum status;
 
     private LocalDateTime dataCadastro;
 

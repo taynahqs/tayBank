@@ -1,6 +1,5 @@
-package br.com.bootcamp.tayBank.models;
+package br.com.bootcamp.tayBank.model;
 
-import br.com.bootcamp.tayBank.enums.StatusAcessoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,21 +17,23 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Acesso {
+public class Conta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long clienteId;
+    private String agencia;
 
-    private String tokenValidacao;
+    private String codigoConta;
 
-    private LocalDateTime validadeTokenValidacao;
+    private String codigoBanco = "123";
 
-    private String senha;
+    private Long propostaId;
 
-    private StatusAcessoEnum status;
+    private BigDecimal saldo = BigDecimal.ZERO;
 
+    private LocalDateTime dataCadastro;
 
+    private LocalDateTime dataAtualizacao;
 }

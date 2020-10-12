@@ -1,4 +1,4 @@
-package br.com.bootcamp.tayBank.models;
+package br.com.bootcamp.tayBank.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

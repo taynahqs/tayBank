@@ -1,7 +1,7 @@
 package br.com.bootcamp.tayBank.repositories;
 
 import br.com.bootcamp.tayBank.enums.StatusPropostaEnum;
-import br.com.bootcamp.tayBank.models.Proposta;
+import br.com.bootcamp.tayBank.model.Proposta;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

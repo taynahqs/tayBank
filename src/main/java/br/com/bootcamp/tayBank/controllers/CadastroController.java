@@ -25,7 +25,7 @@ public class CadastroController {
     @Autowired
     CadastroService cadastroService;
 
-    @PostMapping("/cliente")
+    @PostMapping("/cadastro/cliente")
     @ApiOperation("Cadastro de cliente")
     public ResponseEntity<CadastroClienteView> cadastrarCliente(@RequestBody @Valid CadastroClienteForm cadastroClienteForm) throws ServiceException {
         ValidationUtils.validateCpf(cadastroClienteForm.getCpf());
@@ -35,31 +35,31 @@ public class CadastroController {
         return cadastroService.cadastrarCliente(cadastroClienteForm);
     }
 
-    @PostMapping("/endereco/{propostaId}")
+    @PostMapping("/cadastro/endereco/{propostaId}")
     @ApiOperation("Cadastro do endereço do cliente.")
     public ResponseEntity<CadastroEnderecoView> cadastrarEndereco(@RequestBody @Valid CadastroEnderecoForm cadastroEnderecoForm, @PathVariable Long propostaId) throws ServiceException {
         return cadastroService.cadastrarEndereco(cadastroEnderecoForm, propostaId);
     }
 
-    @PostMapping("/documento/{propostaId}")
+    @PostMapping("/cadastro/documento/{propostaId}")
     @ApiOperation("Envio de foto do documento")
     public ResponseEntity<EnvioDocumentoView> envioDocumento(@RequestBody @Valid EnvioDocumentoForm envioDocumentoForm, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
         return cadastroService.envioDocumento(envioDocumentoForm, propostaId);
     }
 
-    @GetMapping("/dadosProposta/{propostaId}")
+    @GetMapping("/cadastro/dadosProposta/{propostaId}")
     @ApiOperation("Confirmação dos dados da proposta")
     public ResponseEntity<DadosPropostaView> dadosProposta(@PathVariable Long propostaId) throws MissedStepException, ProposalNotFoundException {
         return cadastroService.dadosProposta(propostaId);
     }
 
-    @PutMapping("/aceite/{propostaId}")
+    @PutMapping("/cadastro/aceite/{propostaId}")
     @ApiOperation("Confirmação e aceite da proposta")
     public ResponseEntity<AceiteView> aceite(@RequestHeader Boolean aceite, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
         return cadastroService.aceite(aceite, propostaId);
     }
 
-    @PutMapping("/dadosProposta/{propostaId}")
+    @PostMapping("/cadastro/dadosProposta/{propostaId}")
     @ApiOperation("Editar algum dado da proposta")
     public ResponseEntity<DadosPropostaView> dadosProposta(@RequestBody DadosPropostaForm dadosPropostaForm, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
         return cadastroService.editaDadosProposta(dadosPropostaForm, propostaId);

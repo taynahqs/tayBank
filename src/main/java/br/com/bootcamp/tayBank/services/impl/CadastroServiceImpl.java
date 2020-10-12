@@ -8,10 +8,10 @@ import br.com.bootcamp.tayBank.forms.CadastroClienteForm;
 import br.com.bootcamp.tayBank.forms.CadastroEnderecoForm;
 import br.com.bootcamp.tayBank.forms.DadosPropostaForm;
 import br.com.bootcamp.tayBank.forms.EnvioDocumentoForm;
-import br.com.bootcamp.tayBank.models.Cliente;
-import br.com.bootcamp.tayBank.models.Documento;
-import br.com.bootcamp.tayBank.models.Endereco;
-import br.com.bootcamp.tayBank.models.Proposta;
+import br.com.bootcamp.tayBank.model.Cliente;
+import br.com.bootcamp.tayBank.model.Documento;
+import br.com.bootcamp.tayBank.model.Endereco;
+import br.com.bootcamp.tayBank.model.Proposta;
 import br.com.bootcamp.tayBank.repositories.ClienteRepository;
 import br.com.bootcamp.tayBank.repositories.DocumentoRepository;
 import br.com.bootcamp.tayBank.repositories.EnderecoRepository;
@@ -77,7 +77,7 @@ public class CadastroServiceImpl implements CadastroService {
         CadastroClienteView view = new CadastroClienteView(cliente.getId(), "Cliente cadastrado com sucesso!");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, "/endereco/" + proposta.getId());
+        headers.add(HttpHeaders.LOCATION, "/cadastro/endereco/" + proposta.getId());
 
         return new ResponseEntity<>(view, headers, HttpStatus.CREATED);
     }
@@ -117,7 +117,7 @@ public class CadastroServiceImpl implements CadastroService {
         propostaRepository.save(proposta.get());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, "/documento/" + proposta.get().getId());
+        headers.add(HttpHeaders.LOCATION, "/cadastro/documento/" + proposta.get().getId());
 
         CadastroEnderecoView view = new CadastroEnderecoView(endereco.getId(), "Endereço cadastrado com sucesso!");
 
@@ -159,7 +159,7 @@ public class CadastroServiceImpl implements CadastroService {
         propostaRepository.save(proposta.get());
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, "/dadosProposta/" + proposta.get().getId());
+        headers.add(HttpHeaders.LOCATION, "/cadastro/dadosProposta/" + proposta.get().getId());
 
         EnvioDocumentoView view = new EnvioDocumentoView(documento.getId(), "Documento enviado com sucesso!");
 
@@ -200,7 +200,7 @@ public class CadastroServiceImpl implements CadastroService {
                 documentoView);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, "/aceite" + proposta.get().getId());
+        headers.add(HttpHeaders.LOCATION, "/cadastro/dadosProposta/" + proposta.get().getId());
 
 
         return new ResponseEntity<>(view, headers, HttpStatus.OK);
@@ -297,7 +297,7 @@ public class CadastroServiceImpl implements CadastroService {
                 documentoView);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.LOCATION, "/aceite" + proposta.get().getId());
+        headers.add(HttpHeaders.LOCATION, "/cadastro/aceite" + proposta.get().getId());
 
         return new ResponseEntity<>(view, headers, HttpStatus.OK);
     }

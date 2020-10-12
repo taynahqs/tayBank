@@ -27,7 +27,7 @@ public class AcessoController {
     @Autowired
     AcessoService acessoService;
 
-    @PostMapping("/token")
+    @PostMapping("/acesso/token")
     @ApiOperation("Envio de token de acesso por email")
     public ResponseEntity<TokenView> token(@RequestBody @Valid CriaTokenForm cadastroClienteForm) throws ServiceException {
         ValidationUtils.validateCpf(cadastroClienteForm.getCpf());
@@ -36,7 +36,7 @@ public class AcessoController {
         return acessoService.token(cadastroClienteForm);
     }
 
-    @PostMapping("/ativaUsuario")
+    @PostMapping("/acesso/ativaUsuario")
     @ApiOperation("Ativar usuario")
     @ResponseStatus(HttpStatus.OK)
     public void ativaUsuario(@RequestBody @Valid AtivaUsuarioForm ativaUsuarioForm) throws ServiceException {
