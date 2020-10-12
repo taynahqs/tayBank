@@ -59,7 +59,7 @@ public class CadastroController {
         return cadastroService.aceite(aceite, propostaId);
     }
 
-    @PostMapping("/cadastro/dadosProposta/{propostaId}")
+    @PutMapping("/cadastro/dadosProposta/{propostaId}")
     @ApiOperation("Editar algum dado da proposta")
     public ResponseEntity<DadosPropostaView> dadosProposta(@RequestBody DadosPropostaForm dadosPropostaForm, @PathVariable Long propostaId) throws ServiceException, ProposalNotFoundException, MissedStepException {
         return cadastroService.editaDadosProposta(dadosPropostaForm, propostaId);
