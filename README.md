@@ -34,11 +34,12 @@ Para rodar a API é necessário ter:
 - IntelliJ
 - Java 11
 - Maven
+- Lombok
 ```
 
 ## Executando os testes
 
-Por falta de tempo, não consegui implementar testes unitários com jUnit, portanto fiz os testes no Postman. Para facilitar, segue exemplos de jsons para chamada dos serviços de cadastro:
+Por falta de tempo, não consegui implementar testes unitários com JUnit, portanto fiz os testes no Postman. Para facilitar, segue exemplos de jsons para chamada dos serviços de cadastro:
 
 POST /cadastro/cliente
 ```
